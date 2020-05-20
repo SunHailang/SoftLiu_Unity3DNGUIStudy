@@ -16,7 +16,7 @@ public class Grid : MonoBehaviour
 
     private void Start()
     {
-        nodeDiameter = nodeRadius;// * 2;
+        nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         CreateGrid();
@@ -83,7 +83,7 @@ public class Grid : MonoBehaviour
     }
 
 
-    public List<Node> path;
+    public Stack<Node> path;
 
     private void OnDrawGizmos()
     {
@@ -93,10 +93,11 @@ public class Grid : MonoBehaviour
         {
             if (path != null)
             {
-                foreach (Node n in path)
+                for (; path.Count > 0;)
                 {
+                    Node n = path.Pop();
                     Gizmos.color = Color.black;
-                    Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeRadius - 0.1f));
+                    Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeRadius * 2 - 0.1f));
                 }
             }
         }
@@ -111,7 +112,7 @@ public class Grid : MonoBehaviour
                     {
                         Gizmos.color = Color.black;
                     }
-                    Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeRadius - 0.1f));
+                    Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeRadius * 2 - 0.1f));
                 }
             }
         }

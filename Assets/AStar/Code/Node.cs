@@ -10,10 +10,10 @@ public class Node : IHeapItem<Node>
     public int gridX;
     public int gridY;
 
-    public int gCost;
-    public int hCost;
+    public int gCost = Int32.MaxValue;
+    public int hCost = Int32.MaxValue;
 
-    public Node parent;
+    public Node parent = null;
 
     private int heapIndex;
 

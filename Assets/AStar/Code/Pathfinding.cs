@@ -79,17 +79,17 @@ public class Pathfinding : MonoBehaviour
 
     private void RetarcePath(Node startNode, Node endNode)
     {
-        List<Node> path = new List<Node>();
+        if(grid.path==null)
+            grid.path = new Stack<Node>();
+        grid.path.Clear();
+
         Node curNode = endNode;
 
-        while (curNode != startNode)
+        while (curNode != null)
         {
-            path.Add(curNode);
+            grid.path.Push(curNode);
             curNode = curNode.parent;
         }
-        path.Reverse();
-
-        grid.path = path;
     }
 
     private int GetDistence(Node nodeA, Node nodeB)
