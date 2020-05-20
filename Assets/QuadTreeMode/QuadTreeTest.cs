@@ -18,6 +18,9 @@ public class QuadTreeTest : MonoBehaviour
     private float m_width = 0.2f;
     private Rectangle m_range = null;
 
+    private List<Point> m_points = new List<Point>();
+    private Rectangle m_rect;
+
     private void Start()
     {
 
@@ -33,10 +36,10 @@ public class QuadTreeTest : MonoBehaviour
         Debug.Log(startWorld + " -> " + endWorld);
         float w = endWorld.x - startWorld.x;
         float h = endWorld.y - startWorld.y;
-        Rectangle rect = new Rectangle(startWorld.x + w / 2, startWorld.y + h / 2, w, h);
+        m_rect = new Rectangle(startWorld.x + w / 2, startWorld.y + h / 2, w, h);
 
 
-        m_tree = new QuadTree(rect, 4);
+        m_tree = new QuadTree(m_rect, 4);
 
         for (int i = 0; i < 500; i++)
         {
@@ -48,7 +51,9 @@ public class QuadTreeTest : MonoBehaviour
             obj.localPosition = pos;
             //obj.position = m_camera.ScreenToWorldPoint(pos);
             //Debug.Log(obj.position);
-            m_tree.insert(new Point(obj.position.x, obj.position.y, obj.GetComponent<Image>()));
+            Point point = new Point(obj, obj.GetComponent<Image>());
+            m_tree.insert(point);
+            m_points.Add(point);
         }
         Debug.Log("Insert End");
 
@@ -57,16 +62,23 @@ public class QuadTreeTest : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // 动态更新 四叉树
+        m_tree = new QuadTree(m_rect, 4);
 
+        for (int i = 0; i < m_points.Count; i++)
+        {
+            Point point = m_points[i];
+            m_tree.insert(point);
+        }
     }
 
     private void Update()
     {
 
-        //float horizontal = Input.GetAxis("Horizontal"); //获取垂直轴
-        //float vertical = Input.GetAxis("Vertical");    //获取水平轴
-        //m_range.y += vertical * Time.deltaTime;
-        //m_range.x += horizontal * Time.deltaTime;
+        float horizontal = Input.GetAxis("Horizontal"); //获取垂直轴
+        float vertical = Input.GetAxis("Vertical");    //获取水平轴
+        m_range.y += vertical * Time.deltaTime;
+        m_range.x += horizontal * Time.deltaTime;
 
         Vector3 start = new Vector3(520, 115);
         Vector3 leftDown = m_camera.ScreenToWorldPoint(start);
@@ -81,10 +93,10 @@ public class QuadTreeTest : MonoBehaviour
 
         m_tree.Show();
 
-        Vector3 mouseWorld = m_camera.ScreenToWorldPoint(Input.mousePosition);
+        //Vector3 mouseWorld = m_camera.ScreenToWorldPoint(Input.mousePosition);
 
-        m_range.y = mouseWorld.y;
-        m_range.x = mouseWorld.x;
+        //m_range.y = mouseWorld.y;
+        //m_range.x = mouseWorld.x;
 
         //if (Input.GetMouseButtonDown(1))
         //{

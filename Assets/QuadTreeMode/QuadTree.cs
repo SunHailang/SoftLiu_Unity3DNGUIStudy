@@ -125,8 +125,7 @@ public class QuadTree
 /// </summary>
 public class Point
 {
-    public float x;
-    public float y;
+    public Transform trans;
     /// <summary>
     /// BoxCollider的大小
     /// </summary>
@@ -135,10 +134,9 @@ public class Point
 
     private Image m_data;
     public Image data { get { return m_data; } }
-    public Point(float x, float y, Image data)
+    public Point(Transform trans, Image data)
     {
-        this.x = x;
-        this.y = y;
+        this.trans = trans;
         this.m_data = data;
         // 初始化为 0
         //this.w = 0.01851845f;
@@ -179,10 +177,10 @@ public class Rectangle
     /// <returns></returns>
     public bool contains(Point point)
     {
-        return ((point.x + point.w / 2) >= (this.x - this.w / 2) &&
-            (point.x - point.w / 2) <= (this.x + this.w / 2) &&
-            (point.y + point.h / 2) >= (this.y - this.h / 2) &&
-            (point.y - point.h / 2) <= (this.y + this.h / 2));
+        return ((point.trans.position.x + point.w / 2) >= (this.x - this.w / 2) &&
+            (point.trans.position.x - point.w / 2) <= (this.x + this.w / 2) &&
+            (point.trans.position.y + point.h / 2) >= (this.y - this.h / 2) &&
+            (point.trans.position.y - point.h / 2) <= (this.y + this.h / 2));
     }
 
     public bool intersects(Rectangle range)
