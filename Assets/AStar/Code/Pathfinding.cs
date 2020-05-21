@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -20,76 +21,97 @@ public class Pathfinding : MonoBehaviour
         grid = GetComponent<Grid>();
     }
 
-
-    private void Update()
-    {
-        if (Input.GetButtonDown("Jump"))
-        {
-            FindPath(seeker.position, target.position);
-        }
-    }
-
-    private void FindPath(Vector3 startPos, Vector3 targetPos)
+    public void FindPath(PathRequest request, Action<PathResult> callback)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
 
-        Node startNode = grid.NodeFromWorldPoint(startPos);
-        Node targetNode = grid.NodeFromWorldPoint(targetPos);
+        Vector3[] wayPoints = new Vector3[0];
+        bool pathSuccess = false;
 
-        Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
-        HashSet<Node> closeSet = new HashSet<Node>();
+        Node startNode = grid.NodeFromWorldPoint(request.pathStart);
+        Node targetNode = grid.NodeFromWorldPoint(request.pathEnd);
 
-        openSet.Add(startNode);
-        while (openSet.Count > 0)
+        if (startNode.walkable && targetNode.walkable)
         {
-            Node currentNode = openSet.RemoveFirst();
-            closeSet.Add(currentNode);
+            Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
+            HashSet<Node> closeSet = new HashSet<Node>();
 
-            if (currentNode == targetNode)
+            openSet.Add(startNode);
+            while (openSet.Count > 0)
             {
-                sw.Stop();
-                UnityEngine.Debug.Log("Time : " + sw.ElapsedMilliseconds);
-                RetarcePath(startNode, targetNode);
-                //Debug.Log(currentNode.gridX + " : " + currentNode.gridY);
-                return;
-            }
+                Node currentNode = openSet.RemoveFirst();
+                closeSet.Add(currentNode);
 
-            foreach (Node neighbour in grid.GetNeighbours(currentNode))
-            {
-                if (!neighbour.walkable || closeSet.Contains(neighbour))
+                if (currentNode == targetNode)
                 {
-                    continue;
+                    sw.Stop();
+                    UnityEngine.Debug.Log("Time : " + sw.ElapsedMilliseconds);
+                    pathSuccess = true;
+                    break;
                 }
-                int newMovementCostToNeighbour = currentNode.gCost + GetDistence(currentNode, neighbour);
-                if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
-                {
-                    neighbour.gCost = newMovementCostToNeighbour;
-                    neighbour.hCost = GetDistence(neighbour, targetNode);
-                    neighbour.parent = currentNode;
 
-                    if (!openSet.Contains(neighbour))
+                foreach (Node neighbour in grid.GetNeighbours(currentNode))
+                {
+                    if (!neighbour.walkable || closeSet.Contains(neighbour))
                     {
-                        openSet.Add(neighbour);
+                        continue;
+                    }
+                    int newMovementCostToNeighbour = currentNode.gCost + GetDistence(currentNode, neighbour) + neighbour.movementPenalty;
+                    if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                    {
+                        neighbour.gCost = newMovementCostToNeighbour;
+                        neighbour.hCost = GetDistence(neighbour, targetNode);
+                        neighbour.parent = currentNode;
+
+                        if (!openSet.Contains(neighbour))
+                        {
+                            openSet.Add(neighbour);
+                        }
+                        else
+                        {
+                            openSet.UpdateItem(neighbour);
+                        }
                     }
                 }
             }
         }
+        if (pathSuccess)
+        {
+            wayPoints = RetarcePath(startNode, targetNode);
+            pathSuccess = wayPoints.Length > 0;
+        }
+        callback(new PathResult(wayPoints, pathSuccess, request.callback));
     }
 
-    private void RetarcePath(Node startNode, Node endNode)
+    private Vector3[] RetarcePath(Node startNode, Node targetNode)
     {
-        if(grid.path==null)
-            grid.path = new Stack<Node>();
-        grid.path.Clear();
-
-        Node curNode = endNode;
-
-        while (curNode != null)
+        List<Node> path = new List<Node>();
+        Node curNode = targetNode;
+        while (curNode != startNode)
         {
-            grid.path.Push(curNode);
+            path.Add(curNode);
             curNode = curNode.parent;
         }
+        Vector3[] wayPoints = SimplifyPath(path);
+        Array.Reverse(wayPoints);
+        return wayPoints;
+    }
+    private Vector3[] SimplifyPath(List<Node> path)
+    {
+        List<Vector3> wayPoints = new List<Vector3>();
+        Vector2 directionOld = Vector2.zero;
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector2 directionNew = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
+            if (directionNew != directionOld)
+            {
+                wayPoints.Add(path[i].worldPosition);
+            }
+            directionOld = directionNew;
+        }
+        return wayPoints.ToArray();
     }
 
     private int GetDistence(Node nodeA, Node nodeB)

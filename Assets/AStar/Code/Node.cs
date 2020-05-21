@@ -10,6 +10,8 @@ public class Node : IHeapItem<Node>
     public int gridX;
     public int gridY;
 
+    public int movementPenalty;
+
     public int gCost = Int32.MaxValue;
     public int hCost = Int32.MaxValue;
 
@@ -17,12 +19,13 @@ public class Node : IHeapItem<Node>
 
     private int heapIndex;
 
-    public Node(bool _walkAbel, Vector3 _worldPos, int _gridX, int _gridY)
+    public Node(bool _walkAbel, Vector3 _worldPos, int _gridX, int _gridY, int _move)
     {
         this.walkable = _walkAbel;
         this.worldPosition = _worldPos;
         this.gridX = _gridX;
         this.gridY = _gridY;
+        this.movementPenalty = _move;
     }
 
     public int fCost
