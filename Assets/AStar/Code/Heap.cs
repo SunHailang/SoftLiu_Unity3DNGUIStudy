@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 最小优先堆
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class Heap<T>
     where T : IHeapItem<T>
 {

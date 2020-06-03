@@ -7,5 +7,6 @@
 /Library/
 Builds/
 .vs/
+.vscode/
 Temp/
 obj/
