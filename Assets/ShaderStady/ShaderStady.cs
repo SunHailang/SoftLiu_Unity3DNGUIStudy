@@ -7,16 +7,12 @@ using UnityEngine;
 
 public class ShaderStady : MonoBehaviour
 {
-
-    public static void MinifyFile(string path)
-    {
-
-    }
-
+    [SerializeField]
+    private GameObject m_cube;
     // Start is called before the first frame update
     void Start()
     {
-
+        m_cube.GetComponent<Renderer>().material.SetVector("_SetColor",new Vector4(1,0,0,1));
     }
 
     // Update is called once per frame

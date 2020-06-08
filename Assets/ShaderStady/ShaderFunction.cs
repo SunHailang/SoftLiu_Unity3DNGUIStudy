@@ -5,6 +5,22 @@ using UnityEngine;
 public class ShaderFunction : MonoBehaviour
 {
     /*
+Unity 提供的矩阵
+UNITY_MATRIX_MVP	Current model * view * projection matrix. -> 模型-视图-投影
+UNITY_MATRIX_MV	Current model * view matrix. 
+UNITY_MATRIX_V	Current view matrix.
+UNITY_MATRIX_P	Current projection matrix.
+UNITY_MATRIX_VP	Current view * projection matrix.
+UNITY_MATRIX_T_MV	Transpose of model * view matrix. -> 转置
+UNITY_MATRIX_IT_MV	Inverse transpose of model * view matrix. -> 转置的逆
+unity_ObjectToWorld	Current model matrix.
+unity_WorldToObject	Inverse of current world matrix.
+
+Time 常量
+_Time	float4	Time since level load (t/20, t, t*2, t*3), use to animate things inside the shaders.
+_SinTime	float4	Sine of time: (t/8, t/4, t/2, t).
+_CosTime	float4	Cosine of time: (t/8, t/4, t/2, t).
+unity_DeltaTime	float4	Delta time: (dt, 1/dt, smoothDt, 1/smoothDt).
 
     Cg 标准函数库主要分为五个部分：
 
