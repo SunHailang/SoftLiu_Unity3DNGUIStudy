@@ -12,7 +12,13 @@ public class Node : IHeapItem<Node>
 
     public int movementPenalty;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int gCost = Int32.MaxValue;
+    /// <summary>
+    /// 当前节点到目标节点的距离 曼哈顿计算法  横向格子数 + 纵向格子数
+    /// </summary>
     public int hCost = Int32.MaxValue;
 
     public Node parent = null;
