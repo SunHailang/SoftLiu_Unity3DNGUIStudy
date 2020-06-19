@@ -12,7 +12,7 @@ public class PathFinding : MonoBehaviour
     public Transform m_player;
     public Transform m_target;
 
-    public PathGrid grid;
+    private PathGrid grid;
     public PathData pathData;
     private void Awake()
     {
@@ -27,6 +27,8 @@ public class PathFinding : MonoBehaviour
     private void Update()
     {
         if (m_target.position == m_player.position) return;
+
+        //NativeList<Node> 
 
         FindPathJob findPathJob = new FindPathJob()
         {
