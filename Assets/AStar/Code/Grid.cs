@@ -169,6 +169,29 @@ public class Grid : MonoBehaviour
         return grid[x, y];
     }
 
+    public Vector3 FindCanWalkPoint(Vector3 worldPos, ref List<Node> openList, ref List<Node> closeList)
+    {
+        Node node = NodeFromWorldPoint(worldPos);
+        closeList.Add(node);
+        while (closeList.Count > 0)
+        {
+            if (openList.Contains(closeList[0]))
+            {
+                closeList.RemoveAt(0);
+                continue;
+            }
+            if (!closeList[0].walkable)
+            {
+                closeList.AddRange(GetNeighbours(closeList[0]));
+                openList.Add(closeList[0]);
+                closeList.RemoveAt(0);
+                continue;
+            }
+            return closeList[0].worldPosition;
+        }
+        return node.worldPosition;
+    }
+
 
     private void OnDrawGizmos()
     {

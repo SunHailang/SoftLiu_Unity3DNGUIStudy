@@ -7,6 +7,8 @@ public class Unit : MonoBehaviour
     const float miniPathUpdateTime = 0.2f;
     const float pathUpdateMoveThreshold = 0.5f;
 
+    public Grid m_grid;
+
     public Transform target;
 
     public float speed = 10;
@@ -15,6 +17,9 @@ public class Unit : MonoBehaviour
     public float stoppingDst = 10;
 
     Path path;
+
+    private List<Node> openList = new List<Node>();
+    private List<Node> closeList = new List<Node>();
 
     private void Start()
     {
@@ -37,7 +42,11 @@ public class Unit : MonoBehaviour
         {
             yield return new WaitForSeconds(0.3f);
         }
-        PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
+        openList.Clear();
+        closeList.Clear();
+        Vector3 tarPos = m_grid.FindCanWalkPoint(target.position, ref openList, ref closeList);
+
+        PathRequestManager.RequestPath(new PathRequest(transform.position, tarPos, OnPathFound));
 
         float sqrMoveTreshold = pathUpdateMoveThreshold * pathUpdateMoveThreshold;
         Vector3 targetPosOld = target.position;
@@ -47,7 +56,10 @@ public class Unit : MonoBehaviour
             yield return new WaitForSeconds(miniPathUpdateTime);
             if ((target.position - targetPosOld).sqrMagnitude > sqrMoveTreshold)
             {
-                PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
+                openList.Clear();
+                closeList.Clear();
+                tarPos = m_grid.FindCanWalkPoint(target.position, ref openList, ref closeList);
+                PathRequestManager.RequestPath(new PathRequest(transform.position, tarPos, OnPathFound));
                 targetPosOld = target.position;
             }
         }
@@ -100,6 +112,31 @@ public class Unit : MonoBehaviour
         if (path != null)
         {
             path.DrawWithGizmos();
+        }
+    }
+
+    float _time = 0.0f;
+    System.Random _random;
+
+    int seek = 10;
+
+    private void OnEnable()
+    {
+        
+        
+    }
+
+    private void LateUpdate()
+    {
+        _time += Time.deltaTime;
+        if (_time > 1.5f)
+        {
+            UnityEngine.Random.InitState(seek);
+            Debug.LogError($"Random Key: {UnityEngine.Random.Range(1, 15)}, Value:{UnityEngine.Random.value}");
+            _random = new System.Random(seek);
+            Debug.LogError($"Random Value:{_random.Next(1, 15)}, Seek:{0}");
+            _time = 0f;
+            //seek++;
         }
     }
 }
